@@ -1,0 +1,27 @@
+﻿
+@model Product
+    <div class="card product-item border-0 mb-4">
+        <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+
+            @if (Model.ProductPictures.Any())
+            {
+                <img class="img-fluid w-100" src="@Model.ProductPictures.FirstOrDefault().Picture" alt="@Model.Name">
+            }
+            else
+            {
+                <img src="/img/hazirlaniyor.png" alt="@Model.Name" />
+            }
+
+
+        </div>
+        <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+            <h6 class="text-truncate mb-3">@Model.Name</h6>
+            <div class="d-flex justify-content-center">
+                <h6>@Model.FiyatFormatted</h6><p></p><h6 class="text-muted ml-2"></h6>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-center bg-light border">
+            <a asp-controller="Product" asp-action="Detail" asp-route-name="@GeneralTools.GetUrl(Model.Name)" asp-route-id="@Model.ID" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>Detayları Görüntüle</a>
+            
+        </div>
+    </div>

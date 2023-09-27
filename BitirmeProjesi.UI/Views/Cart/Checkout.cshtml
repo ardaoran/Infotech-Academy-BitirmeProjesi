@@ -1,0 +1,173 @@
+﻿
+
+@model CheckOutVM
+
+@{
+    decimal totalCart = Model.Carts.Sum(x => x.Quantity * x.ProductPrice);
+    decimal ShippingFee = 1000;
+    if (totalCart >= ViewBag.ShippingFee) ShippingFee = 0;
+}
+<form class="checkout-form" asp-controller="Cart" asp-action="CheckOut" method="post">
+    <div class="container-fluid pt-5">
+        <div class="row px-xl-5">
+            <div class="col-lg-8">
+
+                <div class="mb-4">
+
+                    <h4 class="font-weight-semi-bold mb-4">Fatura Bilgileri</h4>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Ad Soyad</label>
+                            <input type="text" asp-for="@Model.Order.NameSurname" class="form-control" placeholder="Adı Soyadı">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>E-mail</label>
+                            <input type="text" asp-for="@Model.Order.MailAddress" class="form-control" placeholder="örnek@email.com">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Cep Telefonu</label>
+                            <input type="text" asp-for="@Model.Order.Phone" class=" form-control" placeholder="+123 456 789">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Adres</label>
+                            <input type="text" asp-for="@Model.Order.Address" class=" form-control" placeholder="123 Sokak...">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Ülke</label>
+                            <input type="text" asp-for="@Model.Order.Country" class=" form-control" placeholder="Türkiye">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Şehir</label>
+                            <input type="text" asp-for="@Model.Order.City" class=" form-control" placeholder="İstanbul">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>İlçe</label>
+                            <input type="text" asp-for="@Model.Order.Distirct" class=" form-control" placeholder="Kadıköy">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Posta Kodu</label>
+                            <input type="text" asp-for="@Model.Order.ZipCode" class=" form-control" placeholder="34000">
+                        </div>
+
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-4">
+                <div class="card border-secondary mb-5">
+                    <div class="card-header bg-secondary border-0">
+                        <h4 class="font-weight-semi-bold m-0">Toplam Tutar</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="font-weight-medium mb-3">Ürünler</h5>
+                        @foreach (Cart c in Model.Carts)
+                        {
+                            <div class="d-flex justify-content-between">
+                                <p>@c.ProductName</p>
+                                <p>@c.ProductPrice x @c.Quantity</p>
+                                <p>
+                                    @if (c.Quantity == 1)
+                                    {
+
+
+                                    <p></p>
+                                }
+                                else
+                                {
+                                    <p>@(c.ProductPrice * c.Quantity)</p>
+                                }
+
+                                </div>
+                            }
+
+
+                        <hr class="mt-0">
+                        <div class="d-flex justify-content-between mb-3 pt-1">
+                            <h6 class="font-weight-medium">Ara Toplam</h6>
+                            <h6 class="font-weight-medium">@totalCart TL</h6>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <h6 class="font-weight-medium">Kargo Ücreti</h6>
+                            @if (ShippingFee == 0)
+                            {
+                                <span> Kargo BEDAVA ! </span>
+                            }
+                            else
+                            {
+                                <h6 class="font-weight-medium">@ShippingFee TL</h6>
+                            }
+
+                        </div>
+                    </div>
+                    <div class="card-footer border-secondary bg-transparent">
+                        <div class="d-flex justify-content-between mt-2">
+                            <h5 class="font-weight-bold">Toplam</h5>
+                            <h5 class="font-weight-bold">@(totalCart + ShippingFee) TL </h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card border-secondary mb-5">
+                    <div class="card-header bg-secondary border-0">
+                        <h4 class="font-weight-semi-bold m-0">Ödeme</h4>
+                    </div>
+                    <div class="card-body">
+                        <select class="selectPaymentOption form-control" asp-for="@Model.Order.PaymentOption" asp-items="@Html.GetEnumSelectList<EPaymentOption>()" onchange="funcSelectPaymentOption(this)">
+                            <option value="">Bir ödeme seçeneği belirtiniz</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <div class="divPaymentOption creditCard">
+                            <h5>Kredi Kartı ile Ödeme</h5>
+
+                            <div class="col-md-20">
+                                <input type="text" asp-for="@Model.Order.CardNumber" class="form-control form-group" placeholder="Kart Numarası">
+                            </div>
+                            <div class="col-md-20">
+                                <input type="text" class="form-group form-control" placeholder="Kart Sahibinin Adı Soyadı">
+                            </div>
+
+                            <div class="col-md-12">
+                                <select class="form-control" asp-for="@Model.Order.CardMonth">
+                                    @for (int i = 1; i <= 12; i++)
+                                    {
+                                        <option>@i</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-12">
+                                <select class="form-control" asp-for="@Model.Order.CardYear">
+                                    @for (int i = DateTime.Now.Year; i <= DateTime.Now.AddYears(10).Year; i++)
+                                    {
+                                        <option>@i</option>
+                                    }
+                                </select>
+                            </div>
+
+
+                            <div class="col-md-12">
+                                <input type="text" asp-for="@Model.Order.CardCV2" class=" form-control" placeholder="CV2">
+                            </div>
+
+
+
+                            <div class="divPaymentOption bayyi">
+                                <h5>Bayiden Ödeme</h5>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="card-footer border-secondary bg-transparent">
+                    <button onclick="checkOutControl()" type="submit" class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3 submit">Alışverişi Tamamla</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    @Html.AntiForgeryToken()
+</form>
